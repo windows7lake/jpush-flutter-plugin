@@ -31,12 +31,20 @@ android {
     lintOptions {
         disable 'InvalidPackage'
     }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
 }
 
 dependencies {
-    implementation 'cn.jiguang.sdk:jpush:3.5.4'
-    implementation 'cn.jiguang.sdk:jcore:2.2.6'
+//    implementation 'cn.jiguang.sdk:jpush:3.5.4'
+//    implementation 'cn.jiguang.sdk:jcore:2.2.6'
 //    implementation 'com.android.support:appcompat-v7:28.+'
+    implementation files('libs/jcore-android-2.3.4-google_play.jar')
+    implementation files('libs/jpush-android-3.6.0-google_play.jar')
     compileOnly files('libs/flutter.jar')
 
 }
