@@ -271,6 +271,17 @@ class JPush {
     return rid;
   }
 
+
+  ///
+  /// 获取 apple APNs token
+  ///
+  /// @param {Function} callback = (String) => {}
+  ///
+  Future<String> getAppleAPNsToken() async {
+    final String token = await _channel.invokeMethod('getAppleAPNSToken');
+    return token;
+  }
+
   ///
   /// 发送本地通知到调度器，指定时间出发该通知。
   /// @param {Notification} notification

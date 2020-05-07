@@ -156,7 +156,11 @@ static NSMutableArray<FlutterResult>* getRidResults;
         [self isNotificationEnabled:call result:result];
     } else if([@"openSettingsForNotification"isEqualToString:call.method]) {
         [self openSettingsForNotification];
-    } else{
+    } else if([@"getAppleAPNSToken" isEqualToString: call.method]){
+        NSString * token = [[NSUserDefaults standardUserDefaults] objectForKey:@"apple_token"];
+        if(token == nil || token.length <= 0) token = @"null";
+        result(token);
+    }else{
         result(FlutterMethodNotImplemented);
     }
 }
@@ -466,6 +470,27 @@ static NSMutableArray<FlutterResult>* getRidResults;
 }
 
 
+- (NSString *)transformDeviceToken:(NSData *)deviceToken {
+    NSString *  token = @"";
+    if(deviceToken == nil) return token;
+    
+    if (@available(iOS 13.0, *)) {
+        NSMutableString *deviceTokenString = [NSMutableString string];
+        const char *bytes = deviceToken.bytes;
+        NSInteger count = deviceToken.length;
+        for (int i = 0; i < count; i++) {
+            [deviceTokenString appendFormat:@"%02x", bytes[i]&0x000000FF];
+        }
+        token = [NSString stringWithFormat:@"%@", deviceTokenString];
+    } else {
+        token =  [[[[deviceToken description]
+                                       stringByReplacingOccurrencesOfString:@"<" withString:@""]
+                                      stringByReplacingOccurrencesOfString:@">" withString:@""]
+                                     stringByReplacingOccurrencesOfString:@" " withString:@""];
+    }
+    return token;
+}
+
 
 - (void)dealloc {
     _isJPushDidLogin = NO;
@@ -519,6 +544,12 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult result))completionHandl
 
 - (void)application:(UIApplication *)application
 didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+    
+    NSString * token = [self transformDeviceToken:deviceToken];
+    if(token == nil || token.length <= 0){
+        token = @"null";
+    }
+    [[NSUserDefaults standardUserDefaults] setObject:token forKey:@"apple_token"];
     [JPUSHService registerDeviceToken:deviceToken];
 }
 
