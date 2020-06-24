@@ -158,7 +158,7 @@ static NSMutableArray<FlutterResult>* getRidResults;
         [self openSettingsForNotification];
     } else if([@"getAppleAPNSToken" isEqualToString: call.method]){
         NSString * token = [[NSUserDefaults standardUserDefaults] objectForKey:@"apple_token"];
-        if(token == nil || token.length <= 0) token = @"null";
+        if(token == nil || token.length <= 0) token = @"";
         result(token);
     }else{
         result(FlutterMethodNotImplemented);
@@ -547,7 +547,7 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
     
     NSString * token = [self transformDeviceToken:deviceToken];
     if(token == nil || token.length <= 0){
-        token = @"null";
+        token = @"";
     }
     [[NSUserDefaults standardUserDefaults] setObject:token forKey:@"apple_token"];
     [JPUSHService registerDeviceToken:deviceToken];
