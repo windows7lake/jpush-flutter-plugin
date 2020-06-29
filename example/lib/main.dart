@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -14,6 +16,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String debugLable = 'Unknown';
   final JPush jpush = new JPush();
+
   @override
   void initState() {
     super.initState();
@@ -22,7 +25,7 @@ class _MyAppState extends State<MyApp> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-    String platformVersion;
+    String platformVersion = "";
 
     try {
       jpush.addEventHandler(
@@ -53,8 +56,10 @@ class _MyAppState extends State<MyApp> {
     }
 
     jpush.setup(
-      appKey: "c08d4c28294c14907e0353cb", //你自己应用的 AppKey
-      channel: "theChannel",
+//      appKey: "c08d4c28294c14907e0353cb", //你自己应用的 AppKey
+//      channel: "theChannel",
+      appKey: "e58a32cb3e4469ebf31867e5", //你自己应用的 AppKey
+      channel: "developer-default",
       production: false,
       debug: true,
     );
@@ -62,18 +67,22 @@ class _MyAppState extends State<MyApp> {
         new NotificationSettingsIOS(sound: true, alert: true, badge: true));
 
     // Platform messages may fail, so we use a try/catch PlatformException.
-    jpush.getRegistrationID().then((rid) {
-      print("flutter get registration id : $rid");
-      setState(() {
-        debugLable = "flutter getRegistrationID: $rid";
+    try {
+      jpush.getRegistrationID().then((rid) {
+        print("flutter get registration id : $rid");
+        setState(() {
+          debugLable = "flutter getRegistrationID: $rid";
+        });
       });
-    });
+    } catch (e) {
+      print("flutter get registration id failed : $e");
+    }
 
-
-    jpush.getAppleAPNsToken().then((token){
-      print("flutter get apns id : $token");
-
-    });
+    if (Platform.isIOS) {
+      jpush.getAppleAPNsToken().then((token) {
+        print("flutter get apns id : $token");
+      });
+    }
 
     // If the widget was removed from the tree while the asynchronous platform
     // message was in flight, we want to discard the reply rather than calling
